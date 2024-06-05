@@ -25,6 +25,17 @@ public class UserBookingSession {
     }
 
     public void createBooking(ArrayList<Seat> seats){
+        seats.forEach(Seat::lock);
+        try {
+            for (Seat s : seats) {
+                if (s.getSeatAvailability() != SeatAvailability.AVAILABLE) {
+                    throw new RuntimeException("One or more seats selected are not available at this moment");
+                }
+                s.setSeatAvailability(SeatAvailability.TEMPORARILY_UNAVAILABLE);
+            }
+        } finally {
+            seats.forEach(Seat::unlock);
+        }
         payment = new Payment();
         PaymentStatus paymentStatus = payment.makePayment(seats);
         if(paymentStatus == PaymentStatus.FAILED){
@@ -36,8 +47,13 @@ public class UserBookingSession {
         }
         else if(paymentStatus == PaymentStatus.SUCCESS){
             System.out.println("Payment Passed for "+this.show.getMovie().getName()+show.startTime+" on screen "+show.screen.getSid());
-            for(Seat seat: seats){
-                seat.setSeatAvailability(SeatAvailability.PERMANENTLY_UNAVAILABLE);
+            seats.forEach(Seat::lock);
+            try {
+                for (Seat seat : seats) {
+                    seat.setSeatAvailability(SeatAvailability.PERMANENTLY_UNAVAILABLE);
+                }
+            } finally {
+                seats.forEach(Seat::unlock);
             }
         }
         ArrayList<Integer> seat_ids = new ArrayList<>();

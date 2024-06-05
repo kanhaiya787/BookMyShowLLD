@@ -1,14 +1,27 @@
 package Model;
 
+import java.util.concurrent.Semaphore;
+
 public class Seat {
     SeatType seatType;
     int seatId;
     SeatAvailability seatAvailability;
+    Semaphore seatLock;
+
 
     public Seat(int seatId, SeatAvailability seatAvailability, SeatType seatType) {
         this.seatType = seatType;
         this.seatId = seatId;
         this.seatAvailability = seatAvailability;
+        this.seatLock = new Semaphore(1);
+    }
+
+    public void lock(){
+        seatLock.acquireUninterruptibly();
+    }
+
+    public void unlock(){
+        seatLock.release();
     }
 
     public SeatType getSeatType() {

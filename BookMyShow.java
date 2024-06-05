@@ -8,11 +8,9 @@ import java.util.concurrent.Semaphore;
 public class BookMyShow {
     TheatreController theatreController;
     UserBookingSession userBookingSession;
-    Semaphore semaphore;
-    BookMyShow(Semaphore semaphore){
+    BookMyShow(){
         theatreController = new TheatreController();
         initialize();
-        this.semaphore = semaphore;
     }
 
     public void initialize(){
@@ -44,20 +42,11 @@ public class BookMyShow {
         preferredSeats.add(seats.get(rand.nextInt(seats.size())));
         preferredSeats.add(seats.get(rand.nextInt(seats.size())));
         try {
-            semaphore.acquire();
-            for (Seat s : preferredSeats) {
-                if(s.getSeatAvailability() == SeatAvailability.PERMANENTLY_UNAVAILABLE || s.getSeatAvailability()==SeatAvailability.TEMPORARILY_UNAVAILABLE){
-                    throw new RuntimeException("One or more seats selected are not available at this moment");
-                }
-                s.setSeatAvailability(SeatAvailability.TEMPORARILY_UNAVAILABLE);
-            }
+
             userBookingSession.createBooking(preferredSeats);
         }
         catch (Exception e){
             e.printStackTrace();
-        }
-        finally {
-            semaphore.release();
         }
     }
 

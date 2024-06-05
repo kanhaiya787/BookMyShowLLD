@@ -11,22 +11,9 @@ import java.util.concurrent.Semaphore;
 public class Main {
     public static void main(String[] args) {
 
-        Semaphore semaphore = new Semaphore(1);
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        BookMyShow bookMyShow = new BookMyShow(semaphore);
-        Thread user1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                bookMyShow.startBooking();
-            }
-        });
-        Thread user2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                bookMyShow.startBooking();
-            }
-        });
+        BookMyShow bookMyShow = new BookMyShow();
+        Thread user1 = new Thread(bookMyShow::startBooking);
+        Thread user2 = new Thread(bookMyShow::startBooking);
         user1.start();
         user2.start();
     }
